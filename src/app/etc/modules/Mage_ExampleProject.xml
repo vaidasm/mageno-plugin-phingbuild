@@ -1,0 +1,9 @@
+<config>
+    <modules>
+        <Mage_ExampleProject>
+            <active>true</active>
+            <codePool>local</codePool>
+            <version>{{extension.version}}</version>
+        </Mage_ExampleProject>
+    </modules>
+</config>

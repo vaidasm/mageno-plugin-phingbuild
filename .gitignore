@@ -1,0 +1,4 @@
+/.idea/*
+/build/work/*
+/build/*.tgz
+/build/package.xml

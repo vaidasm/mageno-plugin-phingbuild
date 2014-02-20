@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+    <name>{{extension.name}}</name>
+    <version>{{extension.version}}</version>
+    <stability>{{extension.stability}}</stability>
+    <license uri="{{extension.license.url}}">{{extension.license.name}}</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>{{extension.summary}}</summary>
+    <description>{{extension.description}}</description>
+    <notes>{{extension.notes}}</notes>
+    <authors>
+        <author>
+            <name>{{extension.authors.user}}</name>
+            <user>{{extension.authors.user}}</user>
+            <email>{{extension.authors.email}}</email>
+        </author>
+    </authors>
+
+    <date>{{date}}</date>
+    <time>{{time}}</time>
+    {{content}}
+    <dependencies>
+        <required>
+            <php>
+                <min>{{extension.php.min}}</min>
+                <max>{{extension.php.max}}</max>
+            </php>
+        </required>
+    </dependencies>
+</package>

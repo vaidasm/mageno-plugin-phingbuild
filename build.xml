@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="ExampleMagentoModule" default="dist">
+    <property name="extension.name" value="${phing.project.name}" />
+    <property name="extension.stability" value="devel" />
+    <property name="extension.version" value="0.0.1" />
+    <property name="extension.license.url" value="http://creativecommons.org/licenses/by/4.0/"/>
+    <property name="extension.license.name" value="Creative Commons Attribution 4.0 International License"/>
+    <property name="extension.summary" value="ExampleMagentoModule"/>
+    <property name="extension.description" value="ExampleMagentoModule description"/>
+    <property name="extension.notes" value="ExampleMagentoModule notes"/>
+    <property name="extension.php.min" value="5.3.0"/>
+    <property name="extension.php.max" value="6.0.0"/>
+    <property name="extension.authors.name" value="DataDog"/>
+    <property name="extension.authors.email" value="info@datadog.lt"/>
+    <property name="extension.authors.user" value="DataDog"/>
+
+    <property name="project.builddir" value="${project.basedir}/build" />
+    <property name="project.workdir" value="${project.builddir}/work" />
+    <property name="project.srcdir" value="${project.basedir}/src" />
+
+    <taskdef name="magentoxml" classname="build.tasks.BuildMagentoXmlTask" />
+    <typedef name="resource" classname="build.tasks.MagentoResourceType" />
+
+    <fileset dir="${project.srcdir}" id="src">
+        <include name="*" />
+    </fileset>
+
+    <!-- ============================================  -->
+    <!-- Target: prepare                               -->
+    <!-- ============================================  -->
+    <target name="prepare">
+        <echo msg="Making directory ./build" />
+        <mkdir dir="${project.workdir}" />
+        <delete dir="${project.workdir}" />
+        <delete>
+            <fileset dir="${project.builddir}">
+                <include name="*.tar.gz" />
+                <include name="*.tgz" />
+            </fileset>
+        </delete>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: build                                 -->
+    <!-- ============================================  -->
+    <target name="build" depends="prepare">
+        <echo msg="Copying resource to build directory..." />
+
+        <echo msg="Copying sources to work directory..." />
+        <copy  todir="./build/work">
+            <fileset dir="${project.srcdir}" id="src" />
+            <filterchain>
+                <replacetokens begintoken="{{" endtoken="}}">
+                    <token key="extension.version" value="${extension.version}" />
+                </replacetokens>
+            </filterchain>
+        </copy>
+
+        <echo msg="Creating package.xml..." />
+        <tstamp>
+            <format property="DATE" pattern="%Y-%m-%d" />
+        </tstamp>
+        <tstamp>
+            <format property="TIME" pattern="%H:%M:%S" />
+        </tstamp>
+
+        <magentoxml property="magento.contentxml">
+            <resource type="magelocal">
+                <fileset dir="${project.srcdir}/app/code/local" />
+            </resource>
+            <resource type="mageetc">
+                <fileset dir="${project.srcdir}/app/etc" />
+            </resource>
+            <resource type="magedesign">
+                <fileset dir="${project.srcdir}/app/design" />
+            </resource>
+            <resource type="magelib">
+                <fileset dir="${project.srcdir}/lib" />
+            </resource>
+            <resource type="mageskin">
+                <fileset dir="${project.srcdir}/skin" />
+            </resource>
+            <resource type="magelocale">
+                <fileset dir="${project.srcdir}/app/locale" />
+            </resource>
+        </magentoxml>
+
+        <copy file="${project.basedir}/package.xml" tofile="${project.workdir}/package.xml" overwrite="true">
+            <filterchain>
+                <replacetokens begintoken="{{" endtoken="}}">
+                    <token key="extension.name" value="${extension.name}" />
+                    <token key="extension.version" value="${extension.version}" />
+                    <token key="extension.stability" value="${extension.stability}" />
+                    <token key="extension.license.url" value="${extension.license.url}" />
+                    <token key="extension.summary" value="${extension.summary}" />
+                    <token key="extension.notes" value="${extension.notes}" />
+                    <token key="extension.license.name" value="${extension.license.name}" />
+                    <token key="extension.description" value="${extension.description}" />
+                    <token key="extension.authors.name" value="${extension.authors.name}" />
+                    <token key="extension.authors.email" value="${extension.authors.email}" />
+                    <token key="extension.authors.user" value="${extension.authors.user}" />
+                    <token key="extension.php.min" value="${extension.php.min}" />
+                    <token key="extension.php.max" value="${extension.php.max}" />
+                    <token key="extension.php.max" value="${extension.php.max}" />
+
+                    <token key="content" value="${magento.contentxml}" />
+                    <token key="date" value="${DATE}" />
+                    <token key="time" value="${TIME}" />
+                </replacetokens>
+                <tidyfilter encoding="utf8">
+                    <config name="input-xml" value="true" />
+                    <config name="output-xml" value="true" />
+                    <config name="indent-spaces" value="4" />
+                    <config name="indent" value="true" />
+                    <config name="wrap-attributes" value="false" />
+                </tidyfilter>
+            </filterchain>
+        </copy>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT)  Target: dist                       -->
+    <!-- ============================================  -->
+    <target name="dist" depends="build">
+        <echo msg="Creating archive..." />
+
+        <tar destfile="${project.builddir}/${phing.project.name}-${extension.version}.tgz" compression="gzip">
+            <fileset dir="${project.workdir}">
+                <include name="*" />
+            </fileset>
+        </tar>
+
+        <echo msg="Files copied and compressed in build directory OK!" />
+    </target>
+</project>
